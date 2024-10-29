@@ -1,28 +1,24 @@
 import React, { useState, useEffect } from 'react';
 
 const DeviceMotion = () => {
+  // Saugome dabartinę ir bendrą „x“ akseleracijos reikšmę
   const [acceleration, setAcceleration] = useState({ x: 0, y: 0, z: 0 });
-  const motionThreshold = 2;
+  const [totalXChange, setTotalXChange] = useState(0); // Bendras x pokytis
 
   useEffect(() => {
     const handleMotion = (event) => {
-      // Apskaičiuokite pokyčio dydį
-      const newAcceleration = {
-        x: event.acceleration.x ? event.acceleration.x : 0,
-        y: event.acceleration.y ? event.acceleration.y : 0,
-        z: event.acceleration.z ? event.acceleration.z : 0,
-      };
+      const newX = event.acceleration.x ? event.acceleration.x.toFixed(2) : 0;
 
-      // Patikriname, ar pasikeitimas viršija nustatytą slenkstį
-      const isSignificantMotion = 
-        Math.abs(newAcceleration.x - acceleration.x) > motionThreshold ||
-        Math.abs(newAcceleration.y - acceleration.y) > motionThreshold ||
-        Math.abs(newAcceleration.z - acceleration.z) > motionThreshold
+      // Apskaičiuojame pokytį ir pridėjome prie bendros vertės
+      const xChange = Math.abs(newX - acceleration.x);
 
-      // Atnaujinkite tik jei yra reikšmingas judesys
-      if (isSignificantMotion) {
-        setAcceleration(newAcceleration);
-      }
+      setAcceleration((prev) => ({
+        ...prev,
+        x: newX
+      }));
+      
+      // Atnaujiname bendrą „x“ pokytį
+      setTotalXChange((prevTotal) => prevTotal + xChange);
     };
 
     window.addEventListener('devicemotion', handleMotion);
@@ -30,15 +26,18 @@ const DeviceMotion = () => {
     return () => {
       window.removeEventListener('devicemotion', handleMotion);
     };
-  }, [acceleration, motionThreshold]);
+  }, [acceleration.x]);
 
   return (
     <div style={{ textAlign: 'center' }}>
       <h1>Device Motion Data</h1>
-      <h2>Acceleration</h2>
+      <h2>Current Acceleration</h2>
       <p>X: {acceleration.x}</p>
       <p>Y: {acceleration.y}</p>
       <p>Z: {acceleration.z}</p>
+
+      <h2>Total X Change</h2>
+      <p>{totalXChange.toFixed(2)}</p>
     </div>
   );
 };
