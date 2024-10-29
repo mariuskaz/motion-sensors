@@ -23,9 +23,9 @@ const DeviceMotion = () => {
       if (isSignificantMotion) {
         setAcceleration(a => {  
           return {
-            x: a.x + newAcceleration.x,
-            y: a.y + newAcceleration.y,
-            z: a.z + newAcceleration.z,
+            x: Math.abs(a.x + newAcceleration.x),
+            y: Math.abs(a.y + newAcceleration.y),
+            z: Math.abs(a.z + newAcceleration.z),
           }
         });
       }
