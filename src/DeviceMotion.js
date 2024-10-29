@@ -13,12 +13,6 @@ const DeviceMotion = () => {
         z: event.acceleration.z ? event.acceleration.z.toFixed(2) : 0,
       };
 
-      const newRotationRate = {
-        alpha: event.rotationRate.alpha ? event.rotationRate.alpha.toFixed(2) : 0,
-        beta: event.rotationRate.beta ? event.rotationRate.beta.toFixed(2) : 0,
-        gamma: event.rotationRate.gamma ? event.rotationRate.gamma.toFixed(2) : 0,
-      };
-
       // Patikriname, ar pasikeitimas viršija nustatytą slenkstį
       const isSignificantMotion = 
         Math.abs(newAcceleration.x - acceleration.x) > motionThreshold ||
@@ -27,7 +21,13 @@ const DeviceMotion = () => {
 
       // Atnaujinkite tik jei yra reikšmingas judesys
       if (isSignificantMotion) {
-        setAcceleration(newAcceleration);
+        setAcceleration(a => {  
+          return {
+            x: a.x + newAcceleration.x,
+            y: a.y + newAcceleration.y,
+            z: a.z + newAcceleration.z,
+          }
+        });
       }
     };
 
