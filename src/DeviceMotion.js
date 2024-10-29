@@ -50,7 +50,7 @@ const DeviceMotion= () => {
     // Pradedame vietos stebėjimą
     const watchId = navigator.geolocation.watchPosition(handlePosition, handleError, {
       enableHighAccuracy: true,
-      maximumAge: 1000,
+      maximumAge: 10000,
       timeout: 5000,
     });
 
@@ -63,7 +63,7 @@ const DeviceMotion= () => {
   return (
     <div style={{ textAlign: 'center' }}>
       <h1>Distance Traveled</h1>
-      <p>{(distance / 1000).toFixed(2)} kilometers</p>
+      <p>{(distance / 100).toFixed(2)} meters</p>
     </div>
   );
 };
