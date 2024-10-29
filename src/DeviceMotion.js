@@ -1,61 +1,69 @@
 import React, { useState, useEffect } from 'react';
 
-const DeviceMotion = () => {
-  const [acceleration, setAcceleration] = useState({ x: 0, y: 0, z: 0 });
-  const [velocity, setVelocity] = useState({ x: 0, y: 0, z: 0 });
-  const [distance, setDistance] = useState({ x: 0, y: 0, z: 0 });
-  const [lastTime, setLastTime] = useState(null);
+const DeviceMotion= () => {
+  const [distance, setDistance] = useState(0);
+  const [prevPosition, setPrevPosition] = useState(null);
+
+  // Haversine formulė atstumui tarp dviejų koordinačių skaičiuoti
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const toRadians = (degree) => degree * (Math.PI / 180);
+    const earthRadius = 6371e3; // Žemės spindulys metrais
+
+    const φ1 = toRadians(lat1);
+    const φ2 = toRadians(lat2);
+    const Δφ = toRadians(lat2 - lat1);
+    const Δλ = toRadians(lon2 - lon1);
+
+    const a =
+      Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+      Math.cos(φ1) * Math.cos(φ2) *
+      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return earthRadius * c; // Atstumas metrais
+  };
 
   useEffect(() => {
-    const handleMotion = (event) => {
-      const currentTime = Date.now();
+    // Naudojame Geolocation API sekimui
+    const handlePosition = (position) => {
+      const { latitude, longitude } = position.coords;
 
-      // Tikriname, ar turime ankstesnį laiko žingsnį
-      if (lastTime) {
-        const deltaTime = (currentTime - lastTime) / 1000; // Laikas sekundėmis
+      if (prevPosition) {
+        // Apskaičiuojame atstumą tarp dabartinės ir ankstesnės vietos
+        const segmentDistance = calculateDistance(
+          prevPosition.latitude,
+          prevPosition.longitude,
+          latitude,
+          longitude
+        );
 
-        const newAcceleration = {
-          x: event.acceleration.x || 0,
-          y: event.acceleration.y || 0,
-          z: event.acceleration.z || 0,
-        };
-
-        // Integruojame akseleraciją, kad gautume greitį
-        const newVelocity = {
-          x: velocity.x + newAcceleration.x * deltaTime,
-          y: velocity.y + newAcceleration.y * deltaTime,
-          z: velocity.z + newAcceleration.z * deltaTime,
-        };
-
-        // Integruojame greitį, kad gautume atstumą
-        const newDistance = {
-          x: distance.x + newVelocity.x * deltaTime,
-          y: distance.y + newVelocity.y * deltaTime,
-          z: distance.z + newVelocity.z * deltaTime,
-        };
-
-        setAcceleration(newAcceleration);
-        setVelocity(newVelocity);
-        setDistance(newDistance);
+        setDistance((prevDistance) => prevDistance + segmentDistance);
       }
 
-      // Atnaujiname paskutinį laiko žingsnį
-      setLastTime(currentTime);
+      setPrevPosition({ latitude, longitude });
     };
 
-    window.addEventListener('devicemotion', handleMotion);
+    const handleError = (error) => {
+      console.error("Error fetching location:", error);
+    };
 
+    // Pradedame vietos stebėjimą
+    const watchId = navigator.geolocation.watchPosition(handlePosition, handleError, {
+      enableHighAccuracy: true,
+      maximumAge: 1000,
+      timeout: 5000,
+    });
+
+    // Sustabdyti stebėjimą komponentui atsijungus
     return () => {
-      window.removeEventListener('devicemotion', handleMotion);
+      navigator.geolocation.clearWatch(watchId);
     };
-  }, [lastTime, velocity, distance]);
+  }, [prevPosition]);
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <h1>Estimated Distance Traveled</h1>
-      <p>X: {distance.x.toFixed(2)} meters</p>
-      <p>Y: {distance.y.toFixed(2)} meters</p>
-      <p>Z: {distance.z.toFixed(2)} meters</p>
+      <h1>Distance Traveled</h1>
+      <p>{(distance / 1000).toFixed(2)} kilometers</p>
     </div>
   );
 };
