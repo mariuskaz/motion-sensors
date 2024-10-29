@@ -62,7 +62,7 @@ const DeviceMotion= () => {
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <h1>Distance Traveled</h1>
+      <h1>Distance</h1>
       <p>{(distance / 100).toFixed(2)} meters</p>
     </div>
   );
