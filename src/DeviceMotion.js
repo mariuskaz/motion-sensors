@@ -8,9 +8,9 @@ const DeviceMotion = () => {
     const handleMotion = (event) => {
       // Apskaičiuokite pokyčio dydį
       const newAcceleration = {
-        x: event.acceleration.x ? event.acceleration.x.toFixed(2) : 0,
-        y: event.acceleration.y ? event.acceleration.y.toFixed(2) : 0,
-        z: event.acceleration.z ? event.acceleration.z.toFixed(2) : 0,
+        x: event.acceleration.x ? event.acceleration.x : 0,
+        y: event.acceleration.y ? event.acceleration.y : 0,
+        z: event.acceleration.z ? event.acceleration.z : 0,
       };
 
       // Patikriname, ar pasikeitimas viršija nustatytą slenkstį
