@@ -30,8 +30,7 @@ const DeviceMotion = () => {
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <h1>Device Motion Data</h1>
-      <h2>Current Acceleration</h2>
+      <h2>Acceleration</h2>
       <p>X: {acceleration.x}</p>
       <p>Y: {acceleration.y}</p>
       <p>Z: {acceleration.z}</p>
