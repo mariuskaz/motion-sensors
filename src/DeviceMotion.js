@@ -2,9 +2,6 @@ import React, { useState, useEffect } from 'react';
 
 const DeviceMotion = () => {
   const [acceleration, setAcceleration] = useState({ x: 0, y: 0, z: 0 });
-  const [rotationRate, setRotationRate] = useState({ alpha: 0, beta: 0, gamma: 0 });
-
-  // Nustatykite slenkstį, kuris nustato reikšmingą judesį (pvz., 1.5)
   const motionThreshold = 2;
 
   useEffect(() => {
@@ -26,15 +23,11 @@ const DeviceMotion = () => {
       const isSignificantMotion = 
         Math.abs(newAcceleration.x - acceleration.x) > motionThreshold ||
         Math.abs(newAcceleration.y - acceleration.y) > motionThreshold ||
-        Math.abs(newAcceleration.z - acceleration.z) > motionThreshold ||
-        Math.abs(newRotationRate.alpha - rotationRate.alpha) > motionThreshold ||
-        Math.abs(newRotationRate.beta - rotationRate.beta) > motionThreshold ||
-        Math.abs(newRotationRate.gamma - rotationRate.gamma) > motionThreshold;
+        Math.abs(newAcceleration.z - acceleration.z) > motionThreshold
 
       // Atnaujinkite tik jei yra reikšmingas judesys
       if (isSignificantMotion) {
         setAcceleration(newAcceleration);
-        setRotationRate(newRotationRate);
       }
     };
 
@@ -43,7 +36,7 @@ const DeviceMotion = () => {
     return () => {
       window.removeEventListener('devicemotion', handleMotion);
     };
-  }, [acceleration, rotationRate, motionThreshold]);
+  }, [acceleration, motionThreshold]);
 
   return (
     <div style={{ textAlign: 'center' }}>
@@ -52,11 +45,6 @@ const DeviceMotion = () => {
       <p>X: {acceleration.x}</p>
       <p>Y: {acceleration.y}</p>
       <p>Z: {acceleration.z}</p>
-
-      <h2>Rotation Rate</h2>
-      <p>Alpha: {rotationRate.alpha}</p>
-      <p>Beta: {rotationRate.beta}</p>
-      <p>Gamma: {rotationRate.gamma}</p>
     </div>
   );
 };
