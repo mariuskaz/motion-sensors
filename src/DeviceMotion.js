@@ -21,13 +21,7 @@ const DeviceMotion = () => {
 
       // Atnaujinkite tik jei yra reikšmingas judesys
       if (isSignificantMotion) {
-        setAcceleration(a => {  
-          return {
-            x: Math.abs(a.x + newAcceleration.x),
-            y: Math.abs(a.y + newAcceleration.y),
-            z: Math.abs(a.z + newAcceleration.z),
-          }
-        });
+        setAcceleration(newAcceleration);
       }
     };
 
