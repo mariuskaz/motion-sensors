@@ -1,24 +1,46 @@
 import React, { useState, useEffect } from 'react';
 
 const DeviceMotion = () => {
-  // Saugome dabartinę ir bendrą „x“ akseleracijos reikšmę
   const [acceleration, setAcceleration] = useState({ x: 0, y: 0, z: 0 });
-  const [totalXChange, setTotalXChange] = useState(0); // Bendras x pokytis
+  const [velocity, setVelocity] = useState({ x: 0, y: 0, z: 0 });
+  const [distance, setDistance] = useState({ x: 0, y: 0, z: 0 });
+  const [lastTime, setLastTime] = useState(null);
 
   useEffect(() => {
     const handleMotion = (event) => {
-      const newX = event.acceleration.x ? event.acceleration.x.toFixed(2) : 0;
+      const currentTime = Date.now();
 
-      // Apskaičiuojame pokytį ir pridėjome prie bendros vertės
-      const xChange = Math.abs(newX - acceleration.x);
+      // Tikriname, ar turime ankstesnį laiko žingsnį
+      if (lastTime) {
+        const deltaTime = (currentTime - lastTime) / 1000; // Laikas sekundėmis
 
-      setAcceleration((prev) => ({
-        ...prev,
-        x: newX
-      }));
-      
-      // Atnaujiname bendrą „x“ pokytį
-      setTotalXChange((prevTotal) => prevTotal + xChange);
+        const newAcceleration = {
+          x: event.acceleration.x || 0,
+          y: event.acceleration.y || 0,
+          z: event.acceleration.z || 0,
+        };
+
+        // Integruojame akseleraciją, kad gautume greitį
+        const newVelocity = {
+          x: velocity.x + newAcceleration.x * deltaTime,
+          y: velocity.y + newAcceleration.y * deltaTime,
+          z: velocity.z + newAcceleration.z * deltaTime,
+        };
+
+        // Integruojame greitį, kad gautume atstumą
+        const newDistance = {
+          x: distance.x + newVelocity.x * deltaTime,
+          y: distance.y + newVelocity.y * deltaTime,
+          z: distance.z + newVelocity.z * deltaTime,
+        };
+
+        setAcceleration(newAcceleration);
+        setVelocity(newVelocity);
+        setDistance(newDistance);
+      }
+
+      // Atnaujiname paskutinį laiko žingsnį
+      setLastTime(currentTime);
     };
 
     window.addEventListener('devicemotion', handleMotion);
@@ -26,18 +48,14 @@ const DeviceMotion = () => {
     return () => {
       window.removeEventListener('devicemotion', handleMotion);
     };
-  }, [acceleration.x]);
+  }, [lastTime, velocity, distance]);
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <h1>Device Motion Data</h1>
-      <h2>Current Acceleration</h2>
-      <p>X: {acceleration.x}</p>
-      <p>Y: {acceleration.y}</p>
-      <p>Z: {acceleration.z}</p>
-
-      <h2>Total X Change</h2>
-      <p>{totalXChange.toFixed(2)}</p>
+      <h1>Estimated Distance Traveled</h1>
+      <p>X: {distance.x.toFixed(2)} meters</p>
+      <p>Y: {distance.y.toFixed(2)} meters</p>
+      <p>Z: {distance.z.toFixed(2)} meters</p>
     </div>
   );
 };
