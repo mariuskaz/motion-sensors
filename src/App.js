@@ -1,12 +1,12 @@
 import React from 'react';
 import './App.css';
-import DeviceMotionDistance from './DeviceMotionDistance';
+import DeviceMotion from './DeviceMotion';
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <DeviceMotionDistance />
+        <DeviceMotion />
       </header>
     </div>
   );
