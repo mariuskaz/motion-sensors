@@ -40,3 +40,5 @@ const DeviceMotion = () => {
     </div>
   );
 };
+
+export default DeviceMotion;
